@@ -12,9 +12,7 @@ class App:
         self.height = 721
         self.middle_pixel = [int(self.width/2), int(self.height/2)]
         pyxel.init(self.width, self.height)
-        # pyxel.run(self.update, self.draw)
-        self.mainThread = threading.Thread(target = pyxel.run, args = [self.update, self.draw] )
-        self.mainThread.start()
+        pyxel.run(self.update, self.draw)
         self.mondelbrotThread.start()
 
     def drawDoteOnPlot(self, x, y, scale = 70, color = 13):
