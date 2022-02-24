@@ -9,7 +9,7 @@ class App:
         self.height = 721
         self.middle_pixel = [int(self.width/2), int(self.height/2)]
 
-        self.mondelbrotIterNum = 1
+        self.mondelbrotIterNum = 20
         self.mondelbrotScale   = 200
         self.biggestValue_X = self.middle_pixel[0]
         self.biggestValue_Y = self.middle_pixel[1]
@@ -55,6 +55,8 @@ class App:
         for i in range(iterNum):
             try:
                 z = z**2 + c
+                if abs(z.real) > 2:
+                    return False
             except OverflowError:
                 return False
         if not cmath.isnan(z):
@@ -62,18 +64,32 @@ class App:
         return False
 
     def drawMondelbrotSet(self):
-        biggestValue_X = 0
-        biggestValue_Y = 0
-        self.mondelbrotIterNum += 10
-        for x_sign, y_sign in zip((-1, 1, 1, -1), (-1, 1, -1, 1)):
-            for x in range(self.biggestValue_X):
-                for y in range(self.biggestValue_Y):
-                    if self.mondelbrotCheck(x*x_sign / self.mondelbrotScale, y*y_sign / self.mondelbrotScale, self.mondelbrotIterNum):
-                        self.drawDoteOnPlot(x*x_sign, y*y_sign, 1)
-                        biggestValue_X = max(abs(x), biggestValue_X)
-                        biggestValue_Y = max(abs(y), biggestValue_Y)
-        self.biggestValue_X = biggestValue_X
-        self.biggestValue_Y = biggestValue_Y
+        self.firstTimeCalculated = False
+        if not self.firstTimeCalculated:
+            self.firstTimeCalculated = True
+            self.dict = {}
+            biggestValue_X = 0
+            biggestValue_Y = 0
+            self.mondelbrotIterNum += 10
+            for x_sign, y_sign in zip((-1, 1, 1, -1), (-1, 1, -1, 1)):
+                for x in range(self.biggestValue_X):
+                    for y in range(self.biggestValue_Y):
+                        if self.mondelbrotCheck(x*x_sign / self.mondelbrotScale, y*y_sign / self.mondelbrotScale, self.mondelbrotIterNum):
+                            self.dict[x] = y
+                            self.drawDoteOnPlot(x*x_sign, y*y_sign, 1)
+                            biggestValue_X = max(abs(x), biggestValue_X)
+                            biggestValue_Y = max(abs(y), biggestValue_Y)
+            self.biggestValue_X = biggestValue_X
+            self.biggestValue_Y = biggestValue_Y
+        else:
+            print("hello")
+            for x in self.dict:
+                y = self.dict[x]
+                if self.mondelbrotCheck(x*x_sign / self.mondelbrotScale, y*y_sign / self.mondelbrotScale, self.mondelbrotIterNum):
+                    self.dict[x] = y
+                    self.drawDoteOnPlot(x*x_sign, y*y_sign, 1)
+                else:
+                    self.dict.pop(x)
         print("current iterations number: ", self.mondelbrotIterNum)
 
     def update(self):
