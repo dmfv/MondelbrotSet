@@ -5,12 +5,16 @@ import threading
 
 class App:
     def __init__(self):
-        self.mondelbrotIterNum = 30
-        self.mondelbrotScale   = 200
-        self.mondelbrotThread = threading.Thread(target = self.drawMondelbrotSet, args = ...)
         self.width = 1281
         self.height = 721
         self.middle_pixel = [int(self.width/2), int(self.height/2)]
+
+        self.mondelbrotIterNum = 1
+        self.mondelbrotScale   = 200
+        self.biggestValue_X = self.middle_pixel[0]
+        self.biggestValue_Y = self.middle_pixel[1]
+
+        self.mondelbrotThread = threading.Thread(target = self.drawMondelbrotSet, args = ...)
         pyxel.init(self.width, self.height)
         pyxel.run(self.update, self.draw)
         self.mondelbrotThread.start()
@@ -58,14 +62,19 @@ class App:
         return False
 
     def drawMondelbrotSet(self):
-        self.mondelbrotIterNum += 1
-        self.biggestValue_X = self.middle_pixel[0]
-        self.biggestValue_Y = self.middle_pixel[1]
+        biggestValue_X = 0
+        biggestValue_Y = 0
+        self.mondelbrotIterNum += 10
         for x_sign, y_sign in zip((-1, 1, 1, -1), (-1, 1, -1, 1)):
             for x in range(self.biggestValue_X):
                 for y in range(self.biggestValue_Y):
                     if self.mondelbrotCheck(x*x_sign / self.mondelbrotScale, y*y_sign / self.mondelbrotScale, self.mondelbrotIterNum):
                         self.drawDoteOnPlot(x*x_sign, y*y_sign, 1)
+                        biggestValue_X = max(abs(x), biggestValue_X)
+                        biggestValue_Y = max(abs(y), biggestValue_Y)
+        self.biggestValue_X = biggestValue_X
+        self.biggestValue_Y = biggestValue_Y
+        print("current iterations number: ", self.mondelbrotIterNum)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
